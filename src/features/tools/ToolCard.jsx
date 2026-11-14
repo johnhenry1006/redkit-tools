@@ -59,6 +59,10 @@ export default function ToolCard({ definition }) {
             }
         }
     }
+    const actionButton = action => <button key={action.id} type="button" disabled={pending} onClick={() => run(action.id)}>
+        {action.badge && <span className={`tools-case-badge tools-case-${action.id}`} aria-hidden="true">{action.badge}</span>}
+        {action.label}
+    </button>;
     return <article className="tools-tool-card" data-tool={definition.id} aria-labelledby={`${identity}-title`}>
         <header><h2 id={`${identity}-title`}>{definition.title}</h2><span className="tools-tool-group">{groups.find(group => group.id === definition.group)?.label}</span></header>
         <p className="tools-tool-description" id={`${identity}-description`}>{definition.description}</p>
@@ -70,10 +74,13 @@ export default function ToolCard({ definition }) {
                     field.type === 'password' ? <input id={fieldId} type="password" value={key} maxLength={definition.limits.key} autoComplete="off" spellCheck={false} onChange={event => { invalidate(); setKey(event.target.value); }} /> :
                     <input id={fieldId} type="number" min={field.min} max={field.max} step="1" value={options[field.name]} onChange={event => { invalidate(); setOptions(previous => ({ ...previous, [field.name]: event.target.value })); }} />}</div>;
             })}
+            {definition.actions.some(action => action.badge) && <div className="tools-case-actions" role="group" aria-label="Text case conversions">
+                {definition.actions.filter(action => action.badge).map(actionButton)}
+            </div>}
             {error && <p className="tools-tool-error" role="alert">{error}</p>}
         </div>
         <div className="tools-tool-actions">
-            {definition.actions.map(action => <button key={action.id} type="button" disabled={pending} onClick={() => run(action.id)}>{action.label}</button>)}
+            {definition.actions.filter(action => !action.badge).map(actionButton)}
             <button type="button" className="tools-secondary" onClick={reset}>Reset</button>
             <button type="button" className="tools-secondary tools-copy" disabled={!result || pending} onClick={copy}>Copy</button>
         </div>

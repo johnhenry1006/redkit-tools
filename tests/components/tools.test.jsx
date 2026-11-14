@@ -79,9 +79,9 @@ it('ignores clipboard success after editing and async failure after unmount', as
     await act(async()=>reject(new Error('old failure')));
     expect(screen.queryByRole('alert')).toBeNull();
 });
-it('filters all 22 stable cards by case/accent-insensitive search and category', async () => {
+it('filters all 23 stable cards by case/accent-insensitive search and category', async () => {
     render(<ToolWorkspace />);
-    expect(screen.getAllByRole('article')).toHaveLength(22);
+    expect(screen.getAllByRole('article')).toHaveLength(23);
     const input=screen.getByLabelText('Search tools');
     fireEvent.change(input,{target:{value:'rándom dígits'}});
     expect(screen.getAllByRole('article')).toHaveLength(1);
@@ -137,4 +137,27 @@ it('reset ignores a late clipboard completion', async () => {
     await act(async () => finish());
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
     expect(screen.getByLabelText('Input text')).toHaveValue('');
+});
+
+it('runs all six case buttons from the original input and resets the card', async () => {
+    render(<ToolWorkspace />);
+    fireEvent.change(screen.getByLabelText('Search tools'), { target: { value: 'text case' } });
+    const tool = screen.getByRole('article');
+    const input = within(tool).getByLabelText('Input text');
+    fireEvent.change(input, { target: { value: 'hello and WORLD' } });
+    for (const [label, expected] of [
+        ['lower case', 'hello and world'], ['UPPER CASE', 'HELLO AND WORLD'],
+        ['Capitalized Case', 'Hello And World'], ['aLtErNaTiNg cAsE', 'hElLo AnD wOrLd'],
+        ['Title Case', 'Hello and World'], ['InVeRsE CaSe', 'HELLO AND world'],
+    ]) {
+        fireEvent.click(within(tool).getByRole('button', { name: label, exact: true }));
+        await act(async () => {});
+        expect(within(tool).getByLabelText('Result Text case')).toHaveTextContent(expected);
+        expect(input).toHaveValue('hello and WORLD');
+        expect(within(tool).getByRole('button', { name: 'Copy' })).toBeEnabled();
+    }
+    fireEvent.click(within(tool).getByRole('button', { name: 'Reset' }));
+    expect(input).toHaveValue('');
+    expect(within(tool).getByLabelText('Result Text case')).toHaveTextContent('No result yet');
+    expect(within(tool).getByRole('button', { name: 'Copy' })).toBeDisabled();
 });

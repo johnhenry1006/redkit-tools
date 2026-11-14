@@ -10,7 +10,7 @@
     "dev": "next dev --port 3002",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
-    "build": "next build --webpack",
+    "build": "node scripts/generate-og.mjs && next build --webpack",
     "preview": "http-server out -a 127.0.0.1 -p 4175 -c-1",
     "test:e2e": "playwright test",
     "quality": "npm run lint && npm test && npm run build && npm run test:e2e",

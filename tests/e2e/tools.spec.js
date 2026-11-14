@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 async function openTools(page) {
     await page.goto('/');
-    await expect(page.locator('[data-tool]')).toHaveCount(22);
+    await expect(page.locator('[data-tool]')).toHaveCount(23);
     await page.waitForLoadState('networkidle');
 }
 const card = (page, id) => page.locator(`[data-tool="${id}"]`);
@@ -11,7 +11,7 @@ const card = (page, id) => page.locator(`[data-tool="${id}"]`);
 test('compact English landing keeps sticky logo, icon navigation and 40px buttons', async ({ page, context }) => {
     await openTools(page);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page).toHaveTitle('RedKit · Free Online Developer Tools');
+    await expect(page).toHaveTitle('RedKit — Free Online Developer Tools');
     await expect(page.locator('.site-brand')).toHaveText('RedKit.');
     await expect(page.locator('.site-brand')).toHaveAccessibleName('RedKit — back to top');
     const icons = await page.locator('link[rel="icon"], link[rel="apple-touch-icon"]').evaluateAll(elements => elements.map(element => element.href));
@@ -58,7 +58,7 @@ test('compact English landing keeps sticky logo, icon navigation and 40px button
     expect(context.pages()).toHaveLength(1);
 });
 
-test('all 22 independent cards follow five approved viewports without overflow', async ({ page }) => {
+test('all 23 independent cards follow five approved viewports without overflow', async ({ page }) => {
     await openTools(page);
     for (const [width, columns] of [[390,1],[768,2],[1024,2],[1440,3],[1920,4]]) {
         await page.setViewportSize({ width, height: 1056 });
@@ -157,6 +157,9 @@ test('actual HTTPS generators, hashes and representations stay local and inert',
         }
         window.toolXss=false;
     });
+    await card(page, 'text-case').getByLabel('Input text').fill('Tiếng Việt đ 😀');
+    await card(page, 'text-case').getByRole('button', { name: 'UPPER CASE', exact: true }).click();
+    await expect(card(page, 'text-case').locator('pre')).toHaveText('TIẾNG VIỆT Đ 😀');
     const password=card(page,'password');
     await password.getByRole('button',{name:'Generate'}).click();
     await expect(password.locator('pre')).toHaveText(/^[A-Za-z0-9!@#$%^&*]{20}$/);
@@ -223,4 +226,42 @@ test('late crypto result, invalid input and denied clipboard retain honest per-c
     await base64.getByRole('button',{name:'Encode'}).click();
     await expect(base64.locator('pre')).toHaveText('Empty result');
     await expect(base64.getByRole('button',{name:'Copy'})).toBeDisabled();
+});
+
+test('text case buttons match six conversions and fit narrow and wide cards', async ({ page }) => {
+    await openTools(page);
+    await page.getByLabel('Search tools').fill('text case');
+    const tool = card(page, 'text-case');
+    await expect(tool).toBeVisible();
+    await tool.getByLabel('Input text').fill('hello and WORLD');
+    for (const [label, expected] of [
+        ['lower case', 'hello and world'], ['UPPER CASE', 'HELLO AND WORLD'],
+        ['Capitalized Case', 'Hello And World'], ['aLtErNaTiNg cAsE', 'hElLo AnD wOrLd'],
+        ['Title Case', 'Hello and World'], ['InVeRsE CaSe', 'HELLO AND world'],
+    ]) {
+        await tool.getByRole('button', { name: label, exact: true }).click();
+        await expect(tool.locator('pre')).toHaveText(expected);
+        await expect(tool.getByLabel('Input text')).toHaveValue('hello and WORLD');
+    }
+    await tool.getByLabel('Input text').fill('TiẾnG VIỆT đ 😀');
+    const upper = tool.getByRole('button', { name: 'UPPER CASE', exact: true });
+    await upper.focus();
+    await page.keyboard.press('Enter');
+    await expect(tool.locator('pre')).toHaveText('TIẾNG VIỆT Đ 😀');
+    for (const width of [320, 390, 768, 1440, 1920]) {
+        await page.setViewportSize({ width, height: 1056 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        expect(await tool.locator('.tools-case-actions').evaluate(row => {
+            const bounds = row.getBoundingClientRect();
+            const buttons = [...row.querySelectorAll('button')].map(button => button.getBoundingClientRect());
+            return buttons.every(button => button.left >= bounds.left && button.right <= bounds.right + 1 && button.height === 40);
+        })).toBe(true);
+        if (width === 390 || width === 1440) await tool.screenshot({ path: test.info().outputPath(`text-case-${width}.png`) });
+    }
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations).toEqual([]);
+    await tool.getByRole('button', { name: 'Reset' }).click();
+    await expect(tool.getByLabel('Input text')).toHaveValue('');
+    await expect(tool.locator('pre')).toHaveText('No result yet');
+    await expect(tool.getByRole('button', { name: 'Copy' })).toBeDisabled();
 });
