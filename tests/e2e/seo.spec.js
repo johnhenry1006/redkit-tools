@@ -4,20 +4,20 @@ test.use({ javaScriptEnabled: false });
 
 test('static HTML exposes consistent SEO, Open Graph and Twitter metadata without JavaScript', async ({ page, request }) => {
     const origin = 'https://redkit-tools.thinh-it.com';
-    const title = 'RedKit · Free Online Developer Tools';
+    const title = 'RedKit — Free Online Developer Tools';
     await page.goto('/');
     await expect(page).toHaveTitle(title);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(page.locator('[data-tool]')).toHaveCount(22);
+    await expect(page.locator('[data-tool]')).toHaveCount(23);
     await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${origin}/`);
     const description = await page.locator('meta[name="description"]').getAttribute('content');
-    expect(description).toContain('Base64');
+    expect(description).toBe('23 free developer tools. Generate, convert and format — all in one place.');
     const tags = {
-        'og:title': title, 'og:description': description, 'og:type': 'website',
+        'og:title': title, 'og:description': '23 free developer tools. Generate, encode, decode, hash and format instantly.', 'og:type': 'website',
         'og:url': `${origin}/`, 'og:site_name': 'RedKit', 'og:locale': 'en_US',
-        'og:image': `${origin}/redkit-og.png`, 'og:image:width': '1200', 'og:image:height': '630',
+        'og:image': `${origin}/og-image.png`, 'og:image:width': '1200', 'og:image:height': '630',
         'og:image:alt': 'RedKit — free browser tools to generate, convert and format data.',
     };
     for (const [property, content] of Object.entries(tags)) {
@@ -25,11 +25,11 @@ test('static HTML exposes consistent SEO, Open Graph and Twitter metadata withou
         await expect(tag).toHaveCount(1);
         await expect(tag).toHaveAttribute('content', content);
     }
-    for (const [name, content] of Object.entries({ 'twitter:card': 'summary_large_image', 'twitter:title': title, 'twitter:description': description, 'twitter:image': `${origin}/redkit-og.png`, 'twitter:image:alt': tags['og:image:alt'] })) {
+    for (const [name, content] of Object.entries({ 'twitter:card': 'summary_large_image', 'twitter:title': title, 'twitter:description': description, 'twitter:image': `${origin}/og-image.png`, 'twitter:image:alt': tags['og:image:alt'] })) {
         await expect(page.locator(`meta[name="${name}"]`)).toHaveAttribute('content', content);
     }
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
-    const image = await request.get('/redkit-og.png');
+    const image = await request.get('/og-image.png');
     expect(image.ok()).toBe(true);
     expect(image.headers()['content-type']).toBe('image/png');
     const data = await image.body();

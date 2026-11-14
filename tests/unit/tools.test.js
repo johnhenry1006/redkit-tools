@@ -4,9 +4,9 @@ import { tools } from '../../src/features/tools/catalog.js';
 import { runTool, ToolInputError } from '../../src/features/tools/engine.js';
 
 const run = args => runTool({ crypto: webcrypto, ...args });
-describe('22 local tools', () => {
+describe('23 local tools', () => {
     it('keeps the approved ordered independent inventory', () => {
-        expect(tools.map(t => t.id)).toEqual(['password','hex-token','base64-token','uuid','digits','base64','base64url','url','html','hex','binary','unicode','json-string','json','rot13','sha256','sha384','sha512','sha1','query','hmac512','hmac256']);
+        expect(tools.map(t => t.id)).toEqual(['password','hex-token','base64-token','uuid','digits','base64','base64url','url','html','hex','binary','unicode','json-string','json','rot13','sha256','sha384','sha512','sha1','query','hmac512','hmac256','text-case']);
         expect(tools.find(t => t.id === 'sha1').description).toMatch(/legacy.*not for new security/i);
         expect(tools.find(t => t.id === 'rot13').description).toMatch(/do not use for security/i);
     });
@@ -76,5 +76,32 @@ describe('22 local tools', () => {
     });
     it('does not fake unavailable cryptographic capabilities', async () => {
         for (const id of ['sha256','hmac256','password','uuid']) await expect(runTool({id,key:'key',crypto:{}})).rejects.toMatchObject({code:'CRYPTO_UNAVAILABLE'});
+    });
+});
+
+describe('text case conversion', () => {
+    it.each([
+        ['lower', 'TiẾnG VIỆT Đ 😀', 'tiếng việt đ 😀'],
+        ['upper', 'Tiếng Việt đ 😀', 'TIẾNG VIỆT Đ 😀'],
+        ['capitalized', "  hELLO\tWORLD\nTIẾNG viỆT don't-stop", "  Hello\tWorld\nTiếng Việt Don't-Stop"],
+        ['alternating', 'AB 12 cd-éĐ 😀ef', 'aB 12 cD-éĐ 😀eF'],
+        ['title', 'THE lord OF the RINGS', 'The Lord of the Rings'],
+        ['title', 'a TALE of TWO cities and', 'A Tale of Two Cities And'],
+        ['inverse', 'hELLo TiẾng Đ 😀123', 'HellO tIếNG đ 😀123'],
+        ['capitalized', 'tIẾNG việT', 'Tiếng Việt'],
+        ['capitalized', '𐐨 hello', '𐐀 Hello'],
+        ['title', '𐐨 and 𐐨', '𐐀 and 𐐀'],
+    ])('%s converts text while preserving spacing, accents and nonletters', async (action, input, expected) => {
+        expect(await run({ id: 'text-case', action, input })).toBe(expected);
+    });
+    it.each(['lower', 'upper', 'capitalized', 'alternating', 'title', 'inverse'])('%s handles empty and whitespace-only input without crypto', async action => {
+        expect(await runTool({ id: 'text-case', action, input: '', crypto: {} })).toBe('');
+        expect(await runTool({ id: 'text-case', action, input: ' \n\t123😀', crypto: {} })).toBe(' \n\t123😀');
+    });
+    it('enforces the shared input and action boundaries', async () => {
+        expect(await run({ id: 'text-case', action: 'upper', input: 'đ'.repeat(10000) })).toBe('Đ'.repeat(10000));
+        await expect(run({ id: 'text-case', action: 'upper', input: 'a'.repeat(10001) })).rejects.toMatchObject({ code: 'INPUT_LIMIT' });
+        await expect(run({ id: 'text-case', action: 'missing', input: 'abc' })).rejects.toMatchObject({ code: 'INVALID_ACTION' });
+        await expect(run({ id: 'text-case', action: 'upper', input: '\ud800' })).rejects.toMatchObject({ code: 'INVALID_INPUT' });
     });
 });

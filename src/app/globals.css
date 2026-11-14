@@ -89,3 +89,15 @@ html, body { margin: 0; }
     .site-footer { flex-direction: row; align-items: center; }
     .site-footer p { flex-basis: calc(100% - 60px); order: 1; }
 }
+
+.tools-case-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.tools-root .tools-case-actions button { gap: 6px; padding: 0 8px; background: #fff; color: var(--tools-ink); border-color: var(--tools-line); font-size: 12px; font-weight: 400; }
+.tools-root .tools-case-actions button:hover:enabled { background: #f4f4f5; border-color: #b9b9bd; }
+.tools-case-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 2px; border-radius: 3px; font: 12px/1 var(--font-body); }
+.tools-case-lower { color: #477600; background: #f0fbdc; }
+.tools-case-upper { color: #00788a; background: #dff9ff; }
+.tools-case-capitalized { color: #9a209f; background: #fde6ff; }
+.tools-case-alternating { color: #826000; background: #fff5ce; }
+.tools-case-title { color: #007958; background: #dcfff3; }
+.tools-case-inverse { color: #a62378; background: #ffe5f6; }
+.tools-case-actions button:disabled .tools-case-badge { opacity: .6; }

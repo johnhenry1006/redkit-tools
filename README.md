@@ -1,6 +1,6 @@
 # RedKit
 
-Website độc lập gồm **22 công cụ** tạo chuỗi, chuyển đổi và kiểm tra dữ liệu. Next.js + React, JavaScript/JSX và CSS, xuất website tĩnh. Không cần dashboard, đăng nhập, API hoặc cơ sở dữ liệu.
+Website độc lập gồm **23 công cụ** tạo chuỗi, chuyển đổi và kiểm tra dữ liệu. Next.js + React, JavaScript/JSX và CSS, xuất website tĩnh. Không cần dashboard, đăng nhập, API hoặc cơ sở dữ liệu.
 
 ## Cài đặt và chạy
 
@@ -25,7 +25,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`npm run quality` chạy lint, unit/component test, build và browser test. Browser test cần OpenSSL, chạy bản export qua HTTPS cục bộ với chứng chỉ tự ký dùng riêng cho kiểm thử; không có backend trong sản phẩm. Playwright kiểm tra 22 công cụ, kết quả Web Crypto thực, dữ liệu không đi qua mạng/storage, trạng thái bất đồng bộ, clipboard bị từ chối, accessibility và màn hình 390–1920px.
+`npm run quality` chạy lint, unit/component test, build và browser test. Browser test cần OpenSSL, chạy bản export qua HTTPS cục bộ với chứng chỉ tự ký dùng riêng cho kiểm thử; không có backend trong sản phẩm. Playwright kiểm tra 23 công cụ, kết quả Web Crypto thực, dữ liệu không đi qua mạng/storage, trạng thái bất đồng bộ, clipboard bị từ chối, accessibility và màn hình 390–1920px.
 
 ## Build và triển khai
 
@@ -56,7 +56,7 @@ Xem bản export cục bộ với `npm run preview` tại http://127.0.0.1:4175;
 - Biểu diễn: Base64 UTF-8, Base64URL, URL component, HTML entities, UTF-8 ↔ hex/nhị phân, Unicode escapes, JSON string, ROT13.
 - Hash: SHA-256, SHA-384, SHA-512, SHA-1 (legacy).
 - HMAC: SHA-256 và SHA-512.
-- Định dạng: JSON format/minify và URL query đọc/tạo.
+- Định dạng: JSON format/minify, URL query đọc/tạo và Text case với sáu nút: lower case, UPPER CASE, Capitalized Case, aLtErNaTiNg cAsE, Title Case, InVeRsE CaSe. Text case giữ khoảng trắng/xuống dòng và hỗ trợ tiếng Việt; kiểu xen kẽ chỉ đếm chữ cái, bắt đầu chữ thường. Title Case viết hoa đầu từ nhưng giữ các từ nối tiếng Anh thường gặp ở dạng thường (trừ từ đầu/cuối).
 
 ## Dữ liệu và giới hạn
 
@@ -65,3 +65,7 @@ Nội dung nhập, khóa HMAC và kết quả chỉ tồn tại trong bộ nhớ
 Tên thư mục `browser-tools` và vị trí cạnh dashboard chỉ là mặc định trên máy hiện tại; repo có thể clone và chạy độc lập ở thư mục khác.
 
 Các module trong `src/features/tools/` được tách từ dashboard; không phụ thuộc đường dẫn hoặc package của dashboard. `tests/unit` giữ các vector độc lập với Node crypto, `tests/components` kiểm tra trạng thái và `tests/e2e` kiểm tra hành vi trình duyệt thật. Git đã được khởi tạo cục bộ; chưa cấu hình remote hay xuất bản.
+
+## Ảnh chia sẻ Open Graph
+
+Metadata dùng `public/og-image.png` (1200×630), được tạo từ artwork gốc `public/redkit-og.png`. `npm run build` tự tạo lại ảnh trước khi xuất tĩnh; `npm run deploy:zip` cũng thực hiện bước này khi tạo gói triển khai. Có thể chạy riêng `node scripts/generate-og.mjs` để xem ảnh sau khi đổi artwork. Script giữ nguyên ảnh gốc và toàn bộ nội dung, thêm nền tối ở mép nếu cần để đúng tỷ lệ.

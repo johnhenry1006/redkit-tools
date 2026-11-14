@@ -1,3 +1,5 @@
+import { changeCase } from './text-case.js';
+
 export function assertUnicode(value) {
     if (!value.isWellFormed()) throw new Error('Invalid Unicode text.');
     return value;
@@ -54,6 +56,7 @@ export function convert(id, action, input) {
             if (typeof value !== 'string') throw new Error();
             return assertUnicode(value);
         }
+        case 'text-case': return changeCase(action, input);
         case 'json': return JSON.stringify(JSON.parse(input), null, action === 'format' ? 2 : 0);
         case 'rot13': return input.replace(/[a-z]/gi, char => String.fromCharCode(char.charCodeAt(0) + (char.toLowerCase() <= 'm' ? 13 : -13)));
         case 'query': {

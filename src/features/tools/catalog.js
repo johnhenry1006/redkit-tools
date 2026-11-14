@@ -3,6 +3,11 @@ const number = (name, label, value, min, max) => ({ name, label, type: 'number',
 const actions = (...entries) => entries.map(([id, label]) => ({ id, label }));
 const representation = actions(['encode', 'Encode'], ['decode', 'Decode']);
 const generate = actions(['run', 'Generate']);
+const caseActions = [
+    ['lower', 'lower case', 'lc'], ['upper', 'UPPER CASE', 'UC'],
+    ['capitalized', 'Capitalized Case', 'CC'], ['alternating', 'aLtErNaTiNg cAsE', 'aC'],
+    ['title', 'Title Case', 'TC'], ['inverse', 'InVeRsE CaSe', 'iC'],
+].map(([id, label, badge]) => ({ id, label, badge }));
 const definitions = [
     ['password', 'Random password', 'random', [number('length', 'Length · 8–128 characters', 20, 8, 128)], generate, 'Includes uppercase, lowercase, numbers and !@#$%^&*.'],
     ['hex-token', 'Hex token', 'random', [number('bytes', 'Bytes · 1–256', 32, 1, 256)], generate, 'Random bytes as hex, with two characters per byte.'],
@@ -26,6 +31,7 @@ const definitions = [
     ['query', 'URL query parser / builder', 'format', [text], actions(['read', 'Parse query'], ['create', 'Build query']), 'Parse or build [key, value] pairs, preserving duplicate keys. Up to 1,000 pairs.'],
     ['hmac512', 'HMAC-SHA512', 'hmac', [text, { name: 'key', label: 'HMAC key (UTF-8)', type: 'password' }], actions(['run', 'Compute HMAC']), 'Keyed SHA-512 authentication, not encryption. Key: 1–1,000 characters.'],
     ['hmac256', 'HMAC-SHA256', 'hmac', [text, { name: 'key', label: 'HMAC key (UTF-8)', type: 'password' }], actions(['run', 'Compute HMAC']), 'Keyed SHA-256 authentication, not encryption. Key: 1–1,000 characters.'],
+    ['text-case', 'Text case', 'format', [text], caseActions, 'Change letter case, including Vietnamese accents. Capitalized: every word. Title: English small words stay lowercase except first/last. Alternating: letters only, starting lowercase.'],
 ];
 export const groups = [
     { id: 'random', label: 'Random' }, { id: 'representation', label: 'Encode' },
