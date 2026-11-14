@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "selected_roles": [
+    "coder",
+    "reviewer",
+    "tester",
+    "designer",
+    "security"
+  ],
+  "managed_roles": {
+    ".codex/agents/coder.toml": "a62179e59ee38d66bdf1740691797f9b7e1628dd909bedacc552416a5034517f",
+    ".codex/agents/reviewer.toml": "86f2310961188859ed9f53a2163da69c36478fa9cce99ac4ffba089fa375e8f0",
+    ".codex/agents/tester.toml": "333030c03b4a6bb545c1f53c389831b105ff588de5083ef5e9c1b93d47c473d0",
+    ".codex/agents/designer.toml": "ec6efae82bd8fa2dcac5b58b21c2d77c62394392987df9f6fbb2b1c452a289f0",
+    ".codex/agents/security.toml": "b1aa18d02987273d472e21fd22515fba44e19e57c95a792380f1982ea4f9c6f8"
+  },
+  "managed_report": "193bee252ef82f1d71b1e131e3da784328919d5a1e159a623fe999a92bbbf86c",
+  "managed_instruction_section": "1b138486dc39e44142ad58f7066fbca8d05c005b6eefe1c694a76bb89376b4db"
+}
