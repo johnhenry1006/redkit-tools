@@ -36,6 +36,18 @@ npm run build
 
 Upload **nội dung thư mục `out/`** lên document root của website tĩnh có **HTTPS**. Với dịch vụ build tự động: build command `npm run build`, output directory `out`. Không cần `next start`, Node server, biến môi trường hoặc database ở hosting. Không thêm proxy hoặc rewrite API từ dashboard. Bản hiện tại dùng domain root; nếu triển khai dưới đường dẫn con cần cấu hình `basePath` và build lại.
 
+### Tạo ZIP để upload qua cPanel HawkHost
+
+Máy build cần tiện ích `zip` (Ubuntu/Debian: `sudo apt install zip`). Chạy tại thư mục dự án:
+
+```sh
+npm run deploy:zip
+```
+
+Lệnh build trước, chỉ khi build thành công mới đóng gói nội dung `out/` vào **`releases/redkit.zip`**. ZIP chứa `index.html`, `_next/` và các tài nguyên ở gốc, không bọc thêm thư mục `out/`. Chạy lại sẽ cập nhật ZIP và loại bỏ các file không còn trong bản build. Thư mục `releases/` được bỏ qua trong Git.
+
+Trong cPanel, mở **File Manager**, chọn document root của domain (thường là `public_html/` với domain chính), upload `redkit.zip` rồi chọn **Extract** ngay tại đó. Sau giải nén, `index.html` phải nằm trực tiếp trong document root. Xóa ZIP trên hosting và mở website qua HTTPS để kiểm tra. File trùng tên sẽ được ghi đè; file cũ chỉ có trên hosting không tự bị xóa khi giải nén. Bản build hiện tại dành cho domain root; nếu dùng thư mục con cần cấu hình `basePath` rồi build lại.
+
 Xem bản export cục bộ với `npm run preview` tại http://127.0.0.1:4175; dừng preview trước khi chạy browser test vì dùng cùng cổng. Khi truy cập qua domain/IP khác localhost, dùng HTTPS để Web Crypto và clipboard hoạt động đúng. Nếu quyền clipboard bị từ chối, ứng dụng cho phép chọn và sao chép thủ công.
 
 ## Bộ công cụ
