@@ -13,7 +13,8 @@
     "build": "next build --webpack",
     "preview": "http-server out -a 127.0.0.1 -p 4175 -c-1",
     "test:e2e": "playwright test",
-    "quality": "npm run lint && npm test && npm run build && npm run test:e2e"
+    "quality": "npm run lint && npm test && npm run build && npm run test:e2e",
+    "deploy:zip": "npm run build && mkdir -p releases && cd out && zip -q -r -FS ../releases/redkit.zip ."
   },
   "dependencies": {
     "next": "16.4.5",
